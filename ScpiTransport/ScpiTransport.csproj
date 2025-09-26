@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;net7.0-windows</TargetFrameworks>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Description>基于 SCPI 协议的示波器通信核心类库，支持 USB/VXI-11/TCP 多种传输方式。</Description>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net48'">
+    <Reference Include="System.Management" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net7.0-windows'">
+    <PackageReference Include="System.Management" Version="7.0.0" />
+  </ItemGroup>
+</Project>
