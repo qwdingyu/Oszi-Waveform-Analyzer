@@ -1,20 +1,31 @@
-﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OsziWaveformAnalyzer", "Sourcecode\OsziWaveformAnalyzer.csproj", "{8C028E14-51A7-48C5-96BF-F09511A35D9F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OsziWaveformAnalyzer", "Sourcecode\\OsziWaveformAnalyzer.csproj", "{8C028E14-51A7-48C5-96BF-F09511A35D9F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScpiTransport", "ScpiTransport\\ScpiTransport.csproj", "{4318F557-5C73-4748-A500-93C2BE2953C1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScpiTransportDemo", "demo\\ScpiTransportDemo.csproj", "{7EEBD7CF-BEC9-4D1E-B969-00CC1492A8FF}"
 EndProject
 Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8C028E14-51A7-48C5-96BF-F09511A35D9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8C028E14-51A7-48C5-96BF-F09511A35D9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8C028E14-51A7-48C5-96BF-F09511A35D9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8C028E14-51A7-48C5-96BF-F09511A35D9F}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
+        GlobalSection(SolutionConfigurationPlatforms) = preSolution
+                Debug|Any CPU = Debug|Any CPU
+                Release|Any CPU = Release|Any CPU
+        EndGlobalSection
+        GlobalSection(ProjectConfigurationPlatforms) = postSolution
+                {8C028E14-51A7-48C5-96BF-F09511A35D9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+                {8C028E14-51A7-48C5-96BF-F09511A35D9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+                {8C028E14-51A7-48C5-96BF-F09511A35D9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+                {8C028E14-51A7-48C5-96BF-F09511A35D9F}.Release|Any CPU.Build.0 = Release|Any CPU
+                {4318F557-5C73-4748-A500-93C2BE2953C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+                {4318F557-5C73-4748-A500-93C2BE2953C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+                {4318F557-5C73-4748-A500-93C2BE2953C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+                {4318F557-5C73-4748-A500-93C2BE2953C1}.Release|Any CPU.Build.0 = Release|Any CPU
+                {7EEBD7CF-BEC9-4D1E-B969-00CC1492A8FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+                {7EEBD7CF-BEC9-4D1E-B969-00CC1492A8FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+                {7EEBD7CF-BEC9-4D1E-B969-00CC1492A8FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+                {7EEBD7CF-BEC9-4D1E-B969-00CC1492A8FF}.Release|Any CPU.Build.0 = Release|Any CPU
+        EndGlobalSection
+        GlobalSection(SolutionProperties) = preSolution
+                HideSolutionNode = FALSE
+        EndGlobalSection
 EndGlobal
