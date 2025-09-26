@@ -662,6 +662,82 @@ namespace ScpiTransport
 
             return i_Results;
         }
+        /// <summary>
+        /// Send an UDP broadcast request to port 111 to find connected VXI devices.
+        /// returns all IP Addresses that have responded.
+        /// </summary>
+        public void EnumerateVxiDevices(ComboBox i_ComboDevices, bool b_AddPort = false)
+        {
+            #if TRACE_OUTPUT
+                Debug.Print("> FindDevices()");
+            #endif
+
+            if (mi_Socket != null)
+            {
+                Debug.Assert(false, "Programming Error: A connection is already established.");
+                Dispose(); // Close connection
+            }
+
+            mi_Socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            mi_Socket.ReceiveTimeout  = UDP_RESPONSE_TIMEOUT; // UDP response delay is less than 15 ms
+            mi_Socket.SendTimeout     = 1000;
+            mi_Socket.EnableBroadcast = true;
+
+            cGetPortParam i_Param = new cGetPortParam(DEVICE_CORE_PROGRAM, DEVICE_CORE_VERSION, ProtocolType.Tcp);
+            Byte[] u8_TxPack = BuildRpcTxPacket(eProcedure.Get_Port, i_Param);
+
+            IPEndPoint i_TxEndPoint = new IPEndPoint(IPAddress.Broadcast, PORT_MAPPER_PORT);
+            mi_Socket.SendTo(u8_TxPack, i_TxEndPoint);
+
+            i_ComboDevices.Items.Clear();
+            try
+            {
+                while (true) // run until timeout exception is thrown
+                {
+                    EndPoint i_RxEndPoint = new IPEndPoint(IPAddress.Any, 0);
+                    int s32_Read = mi_Socket.ReceiveFrom(mu8_RxBuffer, ref i_RxEndPoint);
+                    String s_IP  = ((IPEndPoint)i_RxEndPoint).Address.ToString();
+
+                    mi_RxStream.SetLength(0);
+                    mi_RxStream.Write(mu8_RxBuffer, 0, s32_Read);
+
+                    String s_Error = CheckRpcRxPacket();
+                    if (s_Error != null)
+                    {
+                        #if TRACE_OUTPUT
+                            Debug.Print(s_Error);
+                        #endif
+                    }
+                    else if (b_AddPort)
+                    {
+                        int s32_Port = mi_RxStream.ReadInt32("Port");
+                        if (s32_Port > 0 && s32_Port < UInt16.MaxValue)
+                            s_IP += " : " + s32_Port;
+                    }
+
+                    i_ComboDevices.Items.Add(s_IP);
+
+                    #if TRACE_OUTPUT
+                        Debug.Print("    Response from " + s_IP);
+                    #endif
+                }
+            }
+            catch (SocketException Ex)
+            {
+                // Throw any error except timeout
+                if (Ex.ErrorCode != WSAETIMEDOUT)
+                    throw Ex;
+            }
+
+            #if TRACE_OUTPUT
+                Debug.Print("< FindDevices()");
+            #endif
+
+            Dispose();
+
+            if (i_ComboDevices.Items.Count > 0)
+                i_ComboDevices.SelectedIndex = 0;
+        }
 
         /// <summary>
         /// 连接远端 VXI-11 设备，如果端口为 0 则先通过端口映射器查询实际控制端口。
