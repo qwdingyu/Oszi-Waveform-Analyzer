@@ -47,6 +47,7 @@ NAMING CONVENTIONS which allow to see the type of a variable immediately without
 // --------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -580,6 +581,87 @@ namespace ScpiTransport
             }
         }
 
+        /// <summary>
+        /// 向端口 111 发送 UDP 广播请求以发现 VXI-11 设备，并返回所有响应的 IP 地址（可选带端口）。
+        /// Send an UDP broadcast request to port 111 to find connected VXI devices.
+        /// returns all IP Addresses that have responded.
+        /// </summary>
+        public IReadOnlyList<String> EnumerateDevices(bool b_AddPort = false)
+        {
+            #if TRACE_OUTPUT
+                Debug.Print("> FindDevices()");
+            #endif
+
+            if (mi_Socket != null)
+            {
+                Debug.Assert(false, "Programming Error: A connection is already established.");
+                Dispose(); // Close connection
+            }
+
+            List<String> i_Results = new List<String>();
+
+            mi_Socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            mi_Socket.ReceiveTimeout  = UDP_RESPONSE_TIMEOUT; // UDP response delay is less than 15 ms
+            mi_Socket.SendTimeout     = 1000;
+            mi_Socket.EnableBroadcast = true;
+
+            cGetPortParam i_Param = new cGetPortParam(DEVICE_CORE_PROGRAM, DEVICE_CORE_VERSION, ProtocolType.Tcp);
+            Byte[] u8_TxPack = BuildRpcTxPacket(eProcedure.Get_Port, i_Param);
+
+            IPEndPoint i_TxEndPoint = new IPEndPoint(IPAddress.Broadcast, PORT_MAPPER_PORT);
+            mi_Socket.SendTo(u8_TxPack, i_TxEndPoint);
+
+            try
+            {
+                while (true) // run until timeout exception is thrown
+                {
+                    EndPoint i_RxEndPoint = new IPEndPoint(IPAddress.Any, 0);
+                    int s32_Read = mi_Socket.ReceiveFrom(mu8_RxBuffer, ref i_RxEndPoint);
+                    String s_IP  = ((IPEndPoint)i_RxEndPoint).Address.ToString();
+
+                    mi_RxStream.SetLength(0);
+                    mi_RxStream.Write(mu8_RxBuffer, 0, s32_Read);
+
+                    String s_Error = CheckRpcRxPacket();
+                    if (s_Error != null)
+                    {
+                        #if TRACE_OUTPUT
+                            Debug.Print(s_Error);
+                        #endif
+                        continue;
+                    }
+
+                    if (b_AddPort)
+                    {
+                        int s32_Port = mi_RxStream.ReadInt32("Port");
+                        if (s32_Port > 0 && s32_Port < UInt16.MaxValue)
+                            s_IP += " : " + s32_Port;
+                    }
+
+                    i_Results.Add(s_IP);
+
+                    #if TRACE_OUTPUT
+                        Debug.Print("    Response from " + s_IP);
+                    #endif
+                }
+            }
+            catch (SocketException Ex)
+            {
+                // Throw any error except timeout
+                if (Ex.ErrorCode != WSAETIMEDOUT)
+                    throw;
+            }
+            finally
+            {
+                Dispose();
+            }
+
+            #if TRACE_OUTPUT
+                Debug.Print("< FindDevices()");
+            #endif
+
+            return i_Results;
+        }
         /// <summary>
         /// Send an UDP broadcast request to port 111 to find connected VXI devices.
         /// returns all IP Addresses that have responded.
